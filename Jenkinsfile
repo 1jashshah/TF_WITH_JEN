@@ -4,7 +4,6 @@ pipeline {
         AWS_ACCESS_KEY_ID     = credentials('MY-AWS')
         AWS_SECRET_ACCESS_KEY = credentials('MY-AWS')
         AWS_REGION = "ap-south-1"
-        TF_WORKSPACE = ''
     }
     stages {
         stage('git-checkout'){
@@ -25,10 +24,7 @@ pipeline {
                 script {
                     def workspaces = ['developement1', 'ops', 'stage', 'prod']
                     
-                    for (workspace in workspaces) {
-                        TF_WORKSPACE = workspace
-                        
-                        
+                    for (workspace in workspaces) {              
                         sh "terraform workspace new ${workspace}"
                         sh "terraform workspace select ${workspace}"
                         sh "terraform apply --var-file=${workspace}.tfvars --auto-approve"
