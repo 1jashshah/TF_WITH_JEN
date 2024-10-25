@@ -25,9 +25,8 @@ pipeline {
                     for (workspace in workspaces) {
                         TF_WORKSPACE = workspace
                         
-                        if (!workspaceExists) {
-                            sh "terraform workspace new ${workspace}"
-                        }
+                        
+                        sh "terraform workspace new ${workspace}"
                         sh "terraform workspace select ${workspace}"
                         sh "terraform apply --var-file=${workspace}.tfvars --auto-approve"
                     }
