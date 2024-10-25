@@ -14,7 +14,6 @@ pipeline {
                 script {
                  
                     sh 'terraform init'
-                    sh  'terraform plan'
                 }
             }
         }
