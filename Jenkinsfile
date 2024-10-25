@@ -20,7 +20,7 @@ pipeline {
         stage('Apply Terraform for All Workspaces') {
             steps {
                 script {
-                    def workspaces = ['dev', 'ops', 'stage', 'prod']
+                    def workspaces = ['dev2', 'ops', 'stage', 'prod']
                     
                     for (workspace in workspaces) {
                         TF_WORKSPACE = workspace
