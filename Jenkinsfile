@@ -1,6 +1,9 @@
 pipeline {
     agent any
     environment {
+        AWS_ACCESS_KEY_ID     = credentials('MY-AWS')
+        AWS_SECRET_ACCESS_KEY = credentials('MY-AWS')
+        AWS_REGION = "ap-south-1"
         TF_WORKSPACE = ''
     }
     stages {
