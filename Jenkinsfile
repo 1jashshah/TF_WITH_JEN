@@ -11,25 +11,30 @@ pipeline {
                 git url: 'https://github.com/1jashshah/TF_WITH_JEN.git', branch: 'main', credentialsId: 'gitid'
             }
         }
-
         stage('Initialize Terraform') {
             steps {
-                sh 'terraform init'
+                script {
+                    sh 'terraform init'
+                }
             }
         }
-
-        stage('Apply Terraform') {
+        stage('Apply Terraform for All Workspaces') {
             steps {
                 script {
-                    def SWorkspaces = ['developement1', 'ops', 'stage', 'prod']
+                    // Get the list of available Terraform workspaces
+                    def availableWorkspaces = sh(script: 'terraform workspace list | tr -d " *"', returnStdout: true).trim().split('\n')
+                    // Define the specific workspaces that have their own variable files
+                    def specificWorkspaces = ['developement1', 'ops', 'stage', 'prod']
 
-                    // Iterate over predefined workspaces
-                    for (workspace in SWorkspaces) {
-                        // Select or create the workspace
+                    // Iterate through each available workspace
+                    for (workspace in availableWorkspaces) {
+                        // Select the workspace or create it if it doesn't exist
                         sh "terraform workspace select ${workspace} || terraform workspace new ${workspace}"
                         
-                        // Use the workspace-specific .tfvars file if it exists; otherwise, use "default.tfvars"
-                        def varFile = fileExists("${workspace}.tfvars") ? "${workspace}.tfvars" : "default.tfvars"
+                        // Determine the variable file to use
+                        def varFile = specificWorkspaces.contains(workspace) ? "${workspace}.tfvars" : "default.tfvars"
+                        
+                        // Apply the Terraform configuration
                         sh "terraform apply --var-file=${varFile} --auto-approve"
                     }
                 }
@@ -39,7 +44,10 @@ pipeline {
 
     post {
         always {
-            sh 'terraform workspace select default'
+            script {
+                // Switch back to the default workspace after the pipeline runs
+                sh 'terraform workspace select default'
+            }
         }
     }
 }
