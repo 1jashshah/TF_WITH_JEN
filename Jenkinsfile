@@ -6,28 +6,31 @@ pipeline {
         AWS_REGION = "ap-south-1"
     }
     stages {
-        stage('git-checkout'){
-            steps{
+        stage('Git Checkout') {
+            steps {
                 git url: 'https://github.com/1jashshah/TF_WITH_JEN.git', branch: 'main', credentialsId: 'gitid'
             }
         }
+
         stage('Initialize Terraform') {
             steps {
-                script {
-                 
-                    sh 'terraform init'
-                }
+                sh 'terraform init'
             }
         }
-        stage('Apply Terraform for All Workspaces') {
+
+        stage('Apply Terraform') {
             steps {
                 script {
-                    def workspaces = ['developement1', 'ops', 'stage', 'prod']
-                    
-                    for (workspace in workspaces) {              
+                    def SWorkspaces = ['developement1', 'ops', 'stage', 'prod']
+
+                    // Iterate over predefined workspaces
+                    for (workspace in SWorkspaces) {
+                        // Select or create the workspace
                         sh "terraform workspace select ${workspace} || terraform workspace new ${workspace}"
-                        sh "terraform workspace select ${workspace}"
-                        sh "terraform apply --var-file=${workspace}.tfvars --auto-approve"
+                        
+                        // Use the workspace-specific .tfvars file if it exists; otherwise, use "default.tfvars"
+                        def varFile = fileExists("${workspace}.tfvars") ? "${workspace}.tfvars" : "default.tfvars"
+                        sh "terraform apply --var-file=${varFile} --auto-approve"
                     }
                 }
             }
@@ -36,9 +39,7 @@ pipeline {
 
     post {
         always {
-            script {
-                sh 'terraform workspace select default'
-            }
+            sh 'terraform workspace select default'
         }
     }
 }
