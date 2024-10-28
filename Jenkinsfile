@@ -25,7 +25,7 @@ pipeline {
                     def workspaces = ['developement1', 'ops', 'stage', 'prod']
                     
                     for (workspace in workspaces) {              
-                        sh "terraform select ${workspace} || terraform workspace new ${workspace}"
+                        sh "terraform workspace select ${workspace} || terraform workspace new ${workspace}"
                         sh "terraform workspace select ${workspace}"
                         sh "terraform apply --var-file=${workspace}.tfvars --auto-approve"
                     }
