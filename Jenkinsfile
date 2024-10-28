@@ -21,7 +21,7 @@ pipeline {
         stage('Apply Terraform for All Workspaces') {
             steps {
                 script {
-                   def availableWorkspaces = sh(script: 'terraform workspace list | awk \'{print $1}\'', returnStdout: true).trim().split('\n')
+                   def availableWorkspaces = sh(script: 'terraform workspace list | awk \'{print $1}\'',).trim().split('\n')
                     def specificWorkspaces = ['developement1', 'ops', 'stage', 'prod']
 
                     for (workspace in availableWorkspaces) {
