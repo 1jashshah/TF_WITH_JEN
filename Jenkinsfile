@@ -21,15 +21,11 @@ pipeline {
         stage('Apply Terraform for All Workspaces') {
             steps {
                 script {
-                    
                     def availableWorkspaces = sh(script: 'terraform workspace list | tr -d " *"', returnStdout: true).trim().split('\n')
-                   
                     def specificWorkspaces = ['developement1', 'ops', 'stage', 'prod']
 
                     for (workspace in availableWorkspaces) {
-                
                         sh "terraform workspace select ${workspace} || terraform workspace new ${workspace}"
-
                         def varFile = specificWorkspaces.contains(workspace) ? "${workspace}.tfvars" : "default.tfvars"
                         sh "terraform apply --var-file=${varFile} --auto-approve"
                     }
@@ -41,7 +37,6 @@ pipeline {
     post {
         always {
             script {
-                // Switch back to the default workspace after the pipeline runs
                 sh 'terraform workspace select default'
             }
         }
